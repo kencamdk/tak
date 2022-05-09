@@ -6,13 +6,146 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>TAK</title>
+    <title>KenCam 20.03.22</title>
+    <meta name="description" content="Tak">
+    <meta name="author" content="KenCam">
+
+    <meta property="og:title" content="Invitation">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Tak">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <style>
+        img {
+            width: 100%;
+            max-width: 1500px;
+            display: block;
+            margin: auto;
+        }
+
+        @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 1rem;
+            font-family: 'Roboto';
+        }
+
+        .wrapper {
+            height: 100vh;
+            position: relative;
+            background: linear-gradient(135deg, #F2CC8F, #E07A5F);
+        }
+
+        .card-content {
+            max-width: 30rem;
+            background-color: #fff;
+            position: relative;
+            margin: auto;
+            width: 75%;
+            top: 25%;
+            /* left: 50%;
+            transform: translate(-50%, -50%); */
+            border-radius: 1rem;
+            padding: 4rem .5rem;
+            box-shadow: 1px 1px 2rem rgba(0, 0, 0, .3);
+            text-align: center;
+        }
+
+        .card-content h1 {
+            font-size: 1.75rem;
+            margin: 0 0 1.5rem 0;
+        }
+
+        input {
+            padding: .8rem 1rem;
+            width: 40%;
+            border-radius: 1rem;
+            outline: none;
+            border: .1rem solid #d1d1d1;
+            font-size: 1rem;
+        }
+
+        ::placeholder {
+            color: #d1d1d1;
+        }
+
+        .password-btn {
+            padding: .8rem 2rem;
+            border-radius: 1rem;
+            background: #81B29A;
+            /* linear-gradient(90deg, #ff9966, #ff5e62);*/
+            color: #fff;
+            font-size: 1rem;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"
+        integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 </head>
 
 <body>
+    <div id="bgPassword" class="wrapper">
+        <form id="formPassword" class="card-content">
+            <div class="container">
+                <h1 id="cardHeader">Indtast kodeord:</h1>
+            </div>
+            <div id="formInput" class="form-input">
+                <label for="pass"></label>
+                <input id="pass" name="password" required>
+                <button class="password-btn" type="submit">OK</button>
+            </div>
+        </form>
+    </div>
+    <img id="invitation">
 
-  <h1>tak</h1>
+    <script>
+
+        function decryptAndShowImage(data, password, id) {
+            var decrypted = CryptoJS.Rabbit.decrypt(data, password);
+            try {
+                const decryptedData = decrypted.toString(CryptoJS.enc.Utf8);
+                document.getElementById('bgPassword').style.display = "none";
+                document.getElementById(id).setAttribute('src', decryptedData);
+            } catch (error) {
+                document.getElementById('formInput').style.display = "none";
+                document.getElementById('cardHeader').textContent = "Forkert kodeord.."
+            }            
+        }
+
+        const waitForPassword = new Promise((resolve, reject) => {
+            const form = document.getElementById("formPassword");
+            form.addEventListener('submit', function (e) {
+                resolve(document.getElementById("pass").value);
+                event.preventDefault();
+            });
+        });
+        const invitationPromise = fetch("https://raw.githubusercontent.com/kencamdk/thanks-wedding/main/thanks")
+        // const invitationPromise = fetch("http://127.0.0.1:8887/Invitation")
+            .then(d => d.text());
+
+        Promise.all([waitForPassword, invitationPromise]).then((values) => {
+            const password = values[0];
+            decryptAndShowImage(values[1], password, "invitation")
+        });
+
+    </script>
 
 </body>
 
